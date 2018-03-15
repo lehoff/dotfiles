@@ -44,7 +44,7 @@ set directory=~/.cache/nvim,/tmp " Where nvim will put swap files
 set diffopt+=vertical " Default diff split to vertical
 
 " More obvious way to leave INS-mode in a :terminal buffer
-tno <silent> <Esc><Esc> <C-\><C-n>
+tnoremap <silent> <Esc><Esc> <C-\><C-n>
 
 set expandtab " Because we are not animals
 set tabstop=4 " How many spaces displayed for a tab
@@ -58,6 +58,32 @@ endif
 set termguicolors   " Use 24-bit colour where possible
 set background=dark " Use a dark background (some colorschemes obey this)
 
+" Turn off line numbers in terminal
+autocmd TermOpen * setlocal nonumber
+
+" Python pre-requisites: Use pyenv to install python2 and python3, to create
+" segregated python runtimes for neovim to use:
+" NB: Unfortunately if you upgrade pyenv via homebrew later, you'll have to
+" repeat these steps
+" brew install pyenv pyenv-virtualenv
+" # Add 'pyenv' to your oh-my-zsh plugins in ~/.zshrc
+" # Start a new shell
+" pyenv install 2.7.14
+" pyenv install 3.6.3
+" pyenv virtualenv 2.7.14 neovim2
+" pyenv virtualenv 3.6.3 neovim3
+" ## New shell:
+" pyenv activate neovim2
+" pip install neovim flake8
+" pyenv which python # <- g:python_host_prog
+" ## New shell:
+" pyenv activate neovim3
+" pip install neovim flake8
+" pyenv which python # <- g:python3_host_prog
+" Once you've carried out these commands, uncomment these:
+" let g:python_host_prog = '/usr/local/opt/pyenv/versions/neovim2/bin/python'
+" let g:python3_host_prog = '/usr/local/opt/pyenv/versions/neovim3/bin/python'
+
 " Plugins: https://github.com/junegunn/vim-plug#installation
 let g:plug_dir = expand('~/.config/nvim/plugged')
 call plug#begin(g:plug_dir)
@@ -68,18 +94,50 @@ Plug 'vim-airline/vim-airline' | Plug 'vim-airline/vim-airline-themes'
 
 " System: External resources
 Plug 'tpope/vim-fugitive'     " :h fugitive
+" This adds some helpful things when dealing with Github (.com or enterprise)
+" but requires some configuration - see https://github.com/tpope/vim-rhubarb#installation
+" for full instructions
+let g:github_enterprise_urls = ['https://algithub.pd.alertlogic.net']
+Plug 'tpope/vim-rhubarb'      " :h rhubarb
 Plug 'airblade/vim-gitgutter' " :h GitGutter
 Plug 'mileszs/ack.vim' " :h ack | Can be configured for grep, ag, ack
 Plug 'thinca/vim-ref'  " :h ref-introduction
 		       " e.g. :Ref erlang lists:foldl
+" TODO: enable vim-mundo again
+" Plug 'simnalamburt/vim-mundo'
+let g:notes_directories = ['~/.cache/vim-notes']
+let g:notes_conceal_code = 0
+Plug 'xolox/vim-misc' | Plug 'xolox/vim-notes'
 
 Plug 'neomake/neomake' " :h neomake-contents
+let g:deoplete#enable_at_startup = 1
+" TODO There seems to be some weirdnesses around using deoplete:
+" rogue python processes, excessive file handles, and sometimes it just
+" doesn't work at all. Investigate!
+Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+" TODO Add Python plugin
+Plug 'zchee/deoplete-jedi'
+
+" Git runtime files: an earlier version of these is shipped with vim, but
+" this is the official distribution now:
+" [NB: 'runtime files' e.g. syntax and highlight definitions for commit
+" messages]
+Plug 'tpope/vim-git'
+
+" readline style input even in vim commandline: where has this plugin
+" been...?!
+Plug 'tpope/vim-rsi'
+
+Plug 'janko-m/vim-test'
 
 " System: Additional controls
 Plug 'tpope/vim-unimpaired' " :help unimpaired
 Plug 'tpope/vim-surround'   " :help surround
 " quickmenu does nothing without configuration, which we'll do later
 Plug 'skywind3000/quickmenu.vim'
+" Shortcuts for filetype-sensitive comment toggling:
+" in erlang, only recognises single-% comments
+Plug 'tpope/vim-commentary'
 
 
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
@@ -132,7 +190,14 @@ colorscheme NeoSolarized
 let g:airline_powerline_fonts=1
 let g:airline_theme = 'solarized'
 
-" Quickmenu:
+" vim-test:
+let test#strategy = {'nearest': 'neovim',
+    \ 'file': 'neovim',
+    \ 'suite': 'neovim'
+    \}
+
+" Quickmenus:
+call qmenus#load() " See autoload/qmenus.vim
 
 " Language: elixir + autocmd + neomake
 function s:elixir_ft_setting()
@@ -161,6 +226,7 @@ augroup END
 " Language: erlang + autocmd + neomake
 augroup erlang
     autocmd FileType erlang call s:erlang_buflocals()
+    autocmd BufWritePost *.erl,*.hrl Neomake flycheck
 augroup END
 function! s:erlang_buflocals()
     " TODO Skip also if filename ~= "fugitive://"
