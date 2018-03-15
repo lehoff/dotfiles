@@ -1,3 +1,17 @@
+" make neovim use python3 from pyenv
+let g:python3_host_prog = '/Users/torben.hoffmann/.pyenv/versions/neovim3/bin/python'
+
+noremap j k
+noremap k j
+
+" easy navigation between split windows
+nnoremap <C-J> <C-W><C-J>
+nnoremap <C-K> <C-W><C-K>
+nnoremap <C-L> <C-W><C-L>
+nnoremap <C-H> <C-W><C-H>
+
+set tw=90
+
 set laststatus=2       " Always show the statusline under the bottom buffers
 set showtabline=2      " Always show the tabline at the top of the window
 set mouse=a            " Allow mouse/trackpad control in all modes
@@ -67,6 +81,9 @@ Plug 'tpope/vim-surround'   " :help surround
 " quickmenu does nothing without configuration, which we'll do later
 Plug 'skywind3000/quickmenu.vim'
 
+
+Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+let g:deoplete#enable_at_startup = 1
 " Language: erlang
 Plug 'vim-erlang/vim-erlang-runtime', {'for': 'erlang'}
 Plug 'vim-erlang/vim-erlang-omnicomplete', {'for': 'erlang'}
@@ -82,6 +99,29 @@ Plug 'sanmiguel/vim-erlang-compiler', {'branch': 'mtc-compile-as-test',
 " Language: elixir
 Plug 'elixir-lang/vim-elixir', {'for': 'elixir'}
 Plug 'slashmili/alchemist.vim', {'for': 'elixir'}
+
+"Language: python
+Plug 'vim-scripts/indentpython.vim', {'for': 'python'}
+Plug 'zchee/deoplete-jedi'
+
+"Language: haskell
+Plug 'neovimhaskell/haskell-vim', {'for': 'haskell'}
+
+" System: ascii art
+Plug 'vim-scripts/DrawIt'
+
+let g:ycm_autoclose_preview_window_after_completion=1
+map <leader>g  :YcmCompleter GoToDefinitionElseDeclaration<CR>
+
+" Language: haxe
+Plug 'jdonaldson/vaxe'
+
+
+Plug 'tmhedberg/SimpylFold'
+
+" more like an IDE
+Plug 'scrooloose/nerdtree'
+map <C-n> :NERDTreeToggle<CR>
 
 call plug#end()
 
