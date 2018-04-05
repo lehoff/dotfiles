@@ -1,2 +1,7 @@
 # kerl
-. ~/kerl/R16B02_basho10/activate
+# this might not  be needed
+#source ~/.kerlrc
+
+
+#eval "$(pyenv init -)"
+#eval "$(pyenv virtualenv-init -)"

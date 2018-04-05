@@ -3,18 +3,24 @@ export TERM=xterm-256color
 export PATH=$HOME/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH=/Users/sanmiguel/.oh-my-zsh
+export ZSH=$HOME/.oh-my-zsh
+
+# path to pyret script dir
+export PATH=$HOME/git/pyret-lang/src/scripts:$PATH
+
+# Mono bin
+export PATH=$PATH:/Library/Frameworks/Mono.framework/Versions/Current/bin/
 
 LESS='-RiFX'
 
-POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=( status background_jobs custom_kerl )
+POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=( status background_jobs )
 POWERLEVEL9K_CUSTOM_KERL="if [ -z \"\$(kerl prompt)\" ]; then echo \"(none)\"; else echo \"\$(kerl prompt)\" ; fi"
 POWERLEVEL9K_CUSTOM_KERL_BACKGROUND="blue"
 POWERLEVEL9K_CUSTOM_KERL_FOREGROUND="white"
 POWERLEVEL9K_PROMPT_ON_NEWLINE=true
 POWERLEVEL9K_LEFT_SEGMENT_SEPARATOR=""
 POWERLEVEL9K_RIGHT_SEGMENT_SEPARATOR=""
-POWERLEVEL9K_MODE='awesome-fontconfig'
+#POWERLEVEL9K_MODE='awesome-fontconfig'
 # Set name of the theme to load. Optionally, if you set this to "random"
 # it'll load a random theme each time that oh-my-zsh is loaded.
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
@@ -44,7 +50,7 @@ ZSH_THEME="powerlevel9k/powerlevel9k"
 # ENABLE_CORRECTION="true"
 
 # Uncomment the following line to display red dots whilst waiting for completion.
-# COMPLETION_WAITING_DOTS="true"
+COMPLETION_WAITING_DOTS="true"
 
 # Uncomment the following line if you want to disable marking untracked files
 # under VCS as dirty. This makes repository status check for large repositories
@@ -96,3 +102,23 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 source ~/.iterm2_shell_integration.zsh
+
+# From
+#
+# to enable a nice Python REPL
+
+export PYTHONSTARTUP=~/.pythonrc
+
+PATH="/usr/local/opt/python/libexec/bin:$PATH"
+# Virtualenvwrapper things
+export WORKON_HOME=$HOME/.virtualenvs
+export PROJECT_HOME=$HOME/Devel
+source /usr/local/bin/virtualenvwrapper.sh
+
+# make tex use system perl
+export TEXLIVE_WINDOWS_TRY_EXTERNAL_PERL=1
+
+
+
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
