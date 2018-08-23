@@ -122,3 +122,8 @@ export TEXLIVE_WINDOWS_TRY_EXTERNAL_PERL=1
 
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
+export PATH="/usr/local/sbin:$PATH"
+
+. $HOME/.asdf/asdf.sh
+
+. $HOME/.asdf/completions/asdf.bash
