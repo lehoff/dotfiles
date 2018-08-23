@@ -94,8 +94,8 @@ autocmd InsertEnter * checktime
 " pip install neovim flake8
 " pyenv which python # <- g:python3_host_prog
 " Once you've carried out these commands, uncomment these:
-let g:python_host_prog = '/usr/local/opt/pyenv/versions/neovim2/bin/python'
-let g:python3_host_prog = '/usr/local/opt/pyenv/versions/neovim3/bin/python'
+let g:python_host_prog = expand("~/.pyenv/versions/neovim2/bin/python")
+let g:python3_host_prog = expand("~/.pyenv/versions/neovim3/bin/python")
 
 " Plugins: https://github.com/junegunn/vim-plug#installation
 let g:plug_dir = expand('~/.config/nvim/plugged')
@@ -105,8 +105,12 @@ Plug 'iCyMind/NeoSolarized'
 " Fancy status lines (see 'g:airline_*' settings below)
 Plug 'vim-airline/vim-airline' | Plug 'vim-airline/vim-airline-themes'
 
+" Highlight instances of the current word
+Plug 'RRethy/vim-illuminate'
+
 " Vim session control
 Plug 'tpope/vim-obsession'
+set sessionoptions-=buffers
 
 " Improve NetRW windows
 Plug 'tpope/vim-vinegar'
@@ -117,18 +121,17 @@ Plug 'tpope/vim-fugitive'     " :h fugitive
 " This adds some helpful things when dealing with Github (.com or enterprise)
 " but requires some configuration - see https://github.com/tpope/vim-rhubarb#installation
 " for full instructions
-let g:github_enterprise_urls = ['https://algithub.pd.alertlogic.net']
+let g:github_enterprise_urls = ["https://algithub.pd.alertlogic.net"]
 Plug 'tpope/vim-rhubarb'      " :h rhubarb
 Plug 'airblade/vim-gitgutter' " :h GitGutter
+Plug 'whiteinge/diffconflicts' " :h DiffConflicts
 
 " Startup screen:
-" TODO Find a way to pull notifications from Github/GH Enterprise and display
-" them as a list - that might encourage me to actually use them!
 Plug 'mhinz/vim-startify'
 
-Plug 'mileszs/ack.vim' " :h ack | Can be configured for grep, ag, ack
-Plug 'thinca/vim-ref'  " :h ref-introduction
-		       " e.g. :Ref erlang lists:foldl
+Plug 'mileszs/ack.vim'  " :h ack | Can be configured for grep, ag, ack
+Plug 'thinca/vim-ref'   " :h ref-introduction
+                        " e.g. :Ref erlang lists:foldl
 " TODO: enable vim-mundo again
 " Plug 'simnalamburt/vim-mundo'
 let g:notes_directories = ['~/.cache/vim-notes']
@@ -220,8 +223,15 @@ colorscheme NeoSolarized
 " Airline: configuration
 let g:airline#extensions#neomake#enabled = 1
 let g:airline_powerline_fonts=1
-let g:airline_theme = 'solarized'
+let g:airline_theme = 'atomic'
+let [g:airline_left_sep, g:airline_right_sep] = ['', '']
 
+let g:startify_lists = [
+      \ { 'header': ['   Sessions'],       'type': 'sessions' },
+      \ { 'header': ['   MRU '.getcwd()], 'type': 'dir' }
+      \ ]
+
+let g:startify_fortune_use_unicode = 1
 let g:startify_commands = [
     \ ':help reference',
     \ ['Vim Reference', 'h ref'],
@@ -266,8 +276,10 @@ augroup END
 " Language: erlang + autocmd + neomake
 augroup erlang
     autocmd FileType erlang call s:erlang_buflocals()
-    autocmd BufWritePost *.erl,*.hrl Neomake flycheck
+    autocmd BufEnter *.erl call s:erlang_bufenter()
+    " autocmd BufWritePost *.erl,*.hrl Neomake flycheck
 augroup END
+
 function! s:erlang_buflocals()
     " TODO Skip also if filename ~= "fugitive://"
     if !exists('s:my_erl_globals_done')
@@ -278,12 +290,14 @@ function! s:erlang_buflocals()
     let b:erlang_module = expand('%:t:r')
     let b:erlang_srcdir = s:erlang_srcdir()
     let b:erlang_app = s:erlang_app(s:erlang_srcdir())
-    let fname = expand('%:t')
     let b:rebar3_profile = 'test'
 
     set suffixesadd+=.erl
     set suffixesadd+=.hrl
-    let fname = expand('%:t')
+endfunction
+
+function! s:erlang_bufenter()
+    let @m = b:erlang_module
 endfunction
 
 function! s:erlang_globals()
@@ -297,6 +311,7 @@ function! s:erlang_globals()
     " The presence of multiple build dirs is troublesome (i.e. profiles)
     " but perhaps it's sufficient for 90% of cases to only include _build/dev?
     set path+=src
+    set path+=include
     " TODO Paths should change based on project type: rebar rebar3 etc
     set path+=deps/**
     set path+=_build/default/lib
@@ -320,7 +335,12 @@ function! s:erlang_globals()
     let g:surround_60 = "<<\"\r\">>"
     let g:surround_62 = "<<\"\r\">>"
     " TODO But how to do the inverse?
+
+    " EXPERIMENTAL:
+    " Disable the auto-flycheck on BufWritePost for now, replace with
+    command! W w | Neomake flycheck
 endfunction
+
 function! s:erlang_srcdir()
     return expand('%:p:h')
 endfunction

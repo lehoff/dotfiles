@@ -9,13 +9,6 @@
 	editor = /usr/local/bin/nvim
 [help]
 	autocorrect = 1
-[diff]
-	tool = nvim -d
-[merge]
-    tool = vimdiff
-    conflictstyle = diff3
-[mergetool]
-    path = nvim
 [dude]
 	interval = 30
 	notify-command = terminal-notifier -message \"$DESCRIPTION\" -title \"$TITLE\"
@@ -28,4 +21,13 @@
 [url "https://github.com/"]
 	insteadOf = git://github.com/
 [push]
-	default = simple
+	default = current
+[mergetool "diffconflicts"]
+	cmd = nvim -c DiffConflicts $MERGED $BASE $LOCAL $REMOTE
+	trustExitCode = true
+[mergetool]
+	keepBackup = false
+[pull]
+	rebase = true
+[rebase]
+	autoStash = true
