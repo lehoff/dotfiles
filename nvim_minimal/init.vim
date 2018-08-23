@@ -71,6 +71,9 @@ endif
 " Turn off line numbers in terminal
 autocmd TermOpen * setlocal nonumber
 
+" Detect files changed before editing
+autocmd InsertEnter * checktime
+
 " Python pre-requisites: Use pyenv to install python2 and python3, to create
 " segregated python runtimes for neovim to use:
 " NB: Unfortunately if you upgrade pyenv via homebrew later, you'll have to
